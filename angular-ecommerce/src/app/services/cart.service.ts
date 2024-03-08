@@ -6,13 +6,13 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class CartService {
-  constructor() { }
-
 
   cartItems: CartItem[] = [];
 
   totalPrice: Subject<number> = new Subject<number>();  //publish events to all of the subscribers
   totalQuantity: Subject<number> = new Subject<number>();
+
+  constructor() { }
 
   addToCart(theCartItem: CartItem) {
 
@@ -21,19 +21,20 @@ export class CartService {
     let alreadyExistsInCart: boolean = false;
     let existingCartItem: CartItem = undefined!;
 
-    if(this.cartItems.length>0){
+    if (this.cartItems.length > 0) {
       //find the item in the cart based on item id
-      for(let tempCartItem of this.cartItems){
-        if(tempCartItem.id === theCartItem.id){
-          existingCartItem = tempCartItem;
-          break;
-        }
-      }
+      existingCartItem = this.cartItems.find(tempCartItem => tempCartItem.id === theCartItem.id)!;
+      // for (let tempCartItem of this.cartItems) {
+      //   if (tempCartItem.id === theCartItem.id) {
+      //     existingCartItem = tempCartItem;
+      //     break;
+      //   }
+      // }
       //check if we found it
-      alreadyExistsInCart = (existingCartItem != undefined); 
+      alreadyExistsInCart = (existingCartItem != undefined);
     }
 
-    if(alreadyExistsInCart){
+    if (alreadyExistsInCart) {
       //increment the quantity
       existingCartItem.quantity++;
     } else {
@@ -44,14 +45,14 @@ export class CartService {
     //compute cart total price and total quantity
 
     this.computeCartTotals();
-    
-  
+
+
   }
   computeCartTotals() {
     let totalPriceValue: number = 0;
     let totalQuantityValue: number = 0;
 
-    for(let currentCartItem of this.cartItems){
+    for (let currentCartItem of this.cartItems) {
       totalPriceValue += currentCartItem.quantity * currentCartItem.unitPrice;
       totalQuantityValue += currentCartItem.quantity;
     }
@@ -65,7 +66,7 @@ export class CartService {
   }
   logCartData(totalPriceValue: number, totalQuantityValue: number) {
     console.log('Contents of the cart');
-    for(let tempCartItem of this.cartItems){
+    for (let tempCartItem of this.cartItems) {
       const subTotalPrice = tempCartItem.quantity * tempCartItem.unitPrice;
       console.log(`name: ${tempCartItem.name}, quantity=${tempCartItem.quantity}, unitPrice=${tempCartItem.unitPrice}, subTotalPrice=${subTotalPrice}`);
     }
