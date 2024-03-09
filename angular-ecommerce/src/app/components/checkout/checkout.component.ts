@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Luv2ShopFormService } from 'src/app/services/luv2-shop-form.service';
 
 @Component({
   selector: 'app-checkout',
@@ -8,13 +9,17 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class CheckoutComponent implements OnInit {
 
-
   checkoutFormGroup!: FormGroup;
+
   event: any;
+
   totalPrice: number = 0;
   totalQuantity: number = 0;
+  creditCardYears: number[] = [];
+  creditCardMonths: number[] = [];
 
-  constructor(private formBuilder: FormBuilder) { }
+  constructor(private formBuilder: FormBuilder,
+              private luv2ShopFormService: Luv2ShopFormService) { }
 
   ngOnInit(): void {
     this.checkoutFormGroup = this.formBuilder.group({
@@ -46,6 +51,24 @@ export class CheckoutComponent implements OnInit {
         expirationYear: ['']
       })
     });
+
+    // populate credit card months 
+    // current month is 0 based
+    const startMonth: number = new Date().getMonth() + 1;
+    console.log("startMonth: " + startMonth);
+
+    this.luv2ShopFormService.getCreditCardMonths(startMonth).subscribe(
+      data => {
+        console.log("Retrieved credit card months: " + JSON.stringify(data));
+        this.creditCardMonths = data;
+      }
+    );
+      this.luv2ShopFormService.getCreditCardYears().subscribe(
+        data => {
+          console.log("Retrieved credit card years: " + JSON.stringify(data));
+          this.creditCardYears = data;
+        }
+      );
   }
   copyShippingAddressToBillingAddress(event:any) {
     if (event.target.checked) {
