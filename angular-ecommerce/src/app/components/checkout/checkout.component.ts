@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Country } from 'src/app/common/country';
 import { State } from 'src/app/common/state';
 import { Luv2ShopFormService } from 'src/app/services/luv2-shop-form.service';
+import { Luv2ShopValidators } from 'src/app/validators/luv2-shop-validators';
 
 @Component({
   selector: 'app-checkout',
@@ -31,11 +32,20 @@ export class CheckoutComponent implements OnInit {
     private luv2ShopFormService: Luv2ShopFormService) { }
 
   ngOnInit(): void {
+    
     this.checkoutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
-        firstName: [''],
-        lastName: [''],
-        email: ['']
+        firstName: new FormControl('', 
+                                [Validators.required, 
+                                Validators.minLength(2), 
+                                Luv2ShopValidators.notOnlyWhitespace]),
+
+        lastName: new FormControl('', 
+                                [Validators.required, 
+                                Validators.minLength(2),
+                                Luv2ShopValidators.notOnlyWhitespace]),
+
+        email: new FormControl('', [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
       }),
       shippingAddress: this.formBuilder.group({
         street: [''],
@@ -88,6 +98,10 @@ export class CheckoutComponent implements OnInit {
     );
 
   }
+  
+  get firstName() { return this.checkoutFormGroup.get('customer.firstName'); }
+  get lastName() { return this.checkoutFormGroup.get('customer.lastName'); }
+  get email() { return this.checkoutFormGroup.get('customer.email'); }
 
   copyShippingAddressToBillingAddress(event: any) {
     if (event.target.checked) {
@@ -109,6 +123,11 @@ export class CheckoutComponent implements OnInit {
 
   onSubmit() {
     console.log('Handling the submit button');
+
+    if (this.checkoutFormGroup.invalid) {
+      this.checkoutFormGroup.markAllAsTouched();
+    }
+
     console.log(this.checkoutFormGroup.get('customer')?.value);
     console.log("The email adress is " + this.checkoutFormGroup.get('customer')?.value.email);
 
@@ -125,6 +144,7 @@ export class CheckoutComponent implements OnInit {
     // if the current year equals the selected year, then start with the current month
 
     let startMonth: number;
+
     if (currentYear === selectedYear) {
       startMonth = new Date().getMonth() + 1;
     }
