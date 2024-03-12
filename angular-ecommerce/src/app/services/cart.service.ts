@@ -13,7 +13,25 @@ export class CartService {
   totalPrice: Subject<number> = new BehaviorSubject<number>(0);  //publish events to all of the subscribers
   totalQuantity: Subject<number> = new BehaviorSubject<number>(0);
 
-  constructor() { }
+
+  // store: Storage = sessionStorage;   
+  store: Storage = localStorage;        // when shutting down the browser, the cart will still be there
+
+
+  constructor() {
+
+    // read data from storage
+    let data = JSON.parse(this.store.getItem('cartItems')!);
+
+    if (data != null) {
+      this.cartItems = data;
+
+      // compute totals based on the data that is read from storage
+      this.computeCartTotals();
+    }
+
+
+   }
 
   addToCart(theCartItem: CartItem) {
 
@@ -64,7 +82,19 @@ export class CartService {
 
     //log cart data just for debugging purposes
     this.logCartData(totalPriceValue, totalQuantityValue);
+
+
+    //persist cart data
+    this.persistCartItems();
   }
+
+
+  persistCartItems() {
+    this.store.setItem('cartItems', JSON.stringify(this.cartItems));
+
+  }
+
+
   logCartData(totalPriceValue: number, totalQuantityValue: number) {
     console.log('Contents of the cart');
     for (let tempCartItem of this.cartItems) {
@@ -74,6 +104,8 @@ export class CartService {
     console.log(`totalPrice: ${totalPriceValue.toFixed(2)}, totalQuantity: ${totalQuantityValue}`);
     console.log('----------------');
   }
+
+
   decrementQuantity(theCartItem: CartItem) {
     theCartItem.quantity--;
     if (theCartItem.quantity === 0) {
@@ -82,6 +114,8 @@ export class CartService {
       this.computeCartTotals();
     }
   }
+
+
   remove(theCartItem: CartItem) {
     //get index of item in the array
     const itemIndex = this.cartItems.findIndex(tempCartItem => tempCartItem.id === theCartItem.id);
