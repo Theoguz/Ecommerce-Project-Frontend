@@ -20,6 +20,7 @@ export class LoginComponent implements OnInit {
       baseUrl: myAppConfig.oidc.issuer.split('/oauth2')[0],
       clientId: myAppConfig.oidc.clientId,
       redirectUri: myAppConfig.oidc.redirectUri,
+      useClassingEngine: true,
       authParams: {
         pkce: true,
         issuer: myAppConfig.oidc.issuer,
@@ -30,11 +31,9 @@ export class LoginComponent implements OnInit {
    }
 
   ngOnInit(): void {
-
     this.oktaSignin.remove();
-
     this.oktaSignin.renderEl({
-      el: '#okta-sign-in-widget'}, 
+      el: '#okta-sign-in-widget'}, // this name should be same as div id in login.component.html
       (response: any) => {
         if (response.status === 'SUCCESS') {
           this.oktaAuth.signInWithRedirect();
@@ -45,5 +44,6 @@ export class LoginComponent implements OnInit {
       }
     );
   }
+
 
 }
