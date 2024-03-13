@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-
+import { OrderHistory } from 'src/app/common/order-history';
+import { OrderHistoryService } from 'src/app/services/order-history.service';
 @Component({
   selector: 'app-order-history',
   templateUrl: './order-history.component.html',
@@ -7,9 +8,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class OrderHistoryComponent implements OnInit {
 
-  constructor() { }
+  orderHistoryList: OrderHistory[] = [];
+  storage: Storage = sessionStorage;
+  theEmail: string = '';
+
+  constructor(private orderHistoryService: OrderHistoryService) { }
 
   ngOnInit(): void {
+    this.theEmail = JSON.parse(this.storage.getItem('userEmail')!);
+    this.orderHistoryService.getOrderHistory(this.theEmail).subscribe(
+      data => {
+        this.orderHistoryList = data._embedded.orders;
+      }
+    );
   }
 
 }
