@@ -18,9 +18,9 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './components/login/login.component';
 import { LoginStatusComponent } from './components/login-status/login-status.component';
-import { OKTA_CONFIG, OktaAuthGuard,  OktaAuthModule,  OktaCallbackComponent} from '@okta/okta-angular';
+import { OKTA_CONFIG, OktaAuthGuard, OktaAuthModule, OktaCallbackComponent } from '@okta/okta-angular';
 import { OktaAuth } from '@okta/okta-auth-js';
-import  myAppConfig from './config/my-app-config';
+import myAppConfig from './config/my-app-config';
 import { MembersPageComponent } from './components/members-page/members-page.component';
 import { OrderHistoryComponent } from './components/order-history/order-history.component';
 
@@ -31,14 +31,18 @@ const oktaAuth = new OktaAuth(oktaConfig);
 function sentToLoginPage(oktaAuth: OktaAuth, injector: Injector) {
   //Use injector to access any service available in the app
   const router = injector.get(Router);
-  
+
   //Redirect the user to your custom login page
   router.navigate(['/login']);
 }
 
 const routes: Routes = [
-  { path: 'members', component: MembersPageComponent , canActivate: [OktaAuthGuard],
-  data: {onAuthRequired: sentToLoginPage } },
+  { path: 'order-history', component: OrderHistoryComponent, canActivate: [OktaAuthGuard],
+    data: { onAuthRequired: sentToLoginPage } },
+
+  { path: 'members', component: MembersPageComponent, canActivate: [OktaAuthGuard],
+    data: { onAuthRequired: sentToLoginPage } },
+    
   { path: 'login/callback', component: OktaCallbackComponent },
   { path: 'login', component: LoginComponent },
 
@@ -52,6 +56,7 @@ const routes: Routes = [
   { path: '', redirectTo: '/products', pathMatch: 'full' },
   { path: '**', redirectTo: '/products', pathMatch: 'full' }
 ];
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -74,9 +79,9 @@ const routes: Routes = [
     NgbModule,
     ReactiveFormsModule,
     OktaAuthModule
-        
+
   ],
-  providers: [ProductService, { provide: OKTA_CONFIG, useValue: { oktaAuth }}],
+  providers: [ProductService, { provide: OKTA_CONFIG, useValue: { oktaAuth } }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
