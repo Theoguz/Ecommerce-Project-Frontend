@@ -3,15 +3,16 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { Product } from '../common/product';
 import { ProductCategory } from '../common/product-category';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
 
-  private baseUrl = 'http://localhost:8080/api/products';
+  private baseUrl = environment.lu2shopApiUrl + '/products';
 
-  private categoryUrl = 'http://localhost:8080/api/product-category';
+  private categoryUrl = environment.lu2shopApiUrl + '/product-category';
 
   //localhost:8080/api/products?size=100' deleted from the base url // Spring Boot API and size=100 is to get all the products
   constructor(private httpClient: HttpClient) { }
