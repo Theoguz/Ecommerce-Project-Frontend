@@ -20,7 +20,7 @@ export class AuthInterceptorService implements HttpInterceptor {
   private async handleAccess(request: HttpRequest<any>, next: HttpHandler): Promise<HttpEvent<any>> {
 
     // Add auth token to secure endpoints
-    const theEndpoint = environment.lu2shopApiUrl+ '/orders';
+    const theEndpoint = environment.luv2shopApiUrl+ '/orders';
     const securedEndpoints = [theEndpoint];
 
     if (securedEndpoints.some(url => request.urlWithParams.includes(url))) {
