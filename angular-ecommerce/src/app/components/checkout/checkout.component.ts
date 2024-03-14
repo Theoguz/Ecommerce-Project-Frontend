@@ -42,6 +42,8 @@ export class CheckoutComponent implements OnInit {
   cardElement: any;
   displayError: any = "";
 
+  isDisabled: boolean = false;
+
 
   constructor(private formBuilder: FormBuilder,
               private luv2ShopFormService: Luv2ShopFormService,
@@ -279,6 +281,7 @@ export class CheckoutComponent implements OnInit {
     // compute payment info
     this.paymentInfo.amount = Math.round(this.totalPrice * 100);
     this.paymentInfo.currency = "USD";
+    this.paymentInfo.receiptEmail = purchase.customer.email;
 
     // if valid form then
     // - create payment intent
@@ -287,18 +290,33 @@ export class CheckoutComponent implements OnInit {
 
     if (!this.checkoutFormGroup.invalid && this.displayError.textContent === "") {
 
+      this.isDisabled = true;
+
       this.checkoutService.createPaymentIntent(this.paymentInfo).subscribe(
         (paymentIntentResponse) => {
           this.stripe.confirmCardPayment(paymentIntentResponse.client_secret,
             {
               payment_method: {
-                card: this.cardElement
+                card: this.cardElement,
+                billing_details: {
+                  email: purchase.customer.email,
+                  name: purchase.customer.firstName + " " + purchase.customer.lastName,
+                  address: {
+                    line1: purchase.billingAddress.street,
+                    city: purchase.billingAddress.city,
+                    state: purchase.billingAddress.state,
+                    postal_code: purchase.billingAddress.zipCode,
+                    country: this.billingAddressCity?.value.code
+                  }
+                }
               }
             }, { handleActions: false })
           .then((result: any) => {
             if (result.error) {
               // inform the customer there was an error
               alert(`There was an error: ${result.error.message}`);
+              this.isDisabled = false;
+
             } else {
               // call REST API via the CheckoutService
               this.checkoutService.placeOrder(purchase).subscribe({
@@ -307,9 +325,12 @@ export class CheckoutComponent implements OnInit {
 
                   // reset cart
                   this.resetCart();
+                  this.isDisabled = false;
+
                 },
                 error: (err: any) => {
                   alert(`There was an error: ${err.message}`);
+                  this.isDisabled = false;
                 }
               })
             }            
