@@ -10,9 +10,9 @@ import { environment } from 'src/environments/environment';
 })
 export class ProductService {
 
-  private baseUrl = environment.lu2shopApiUrl + '/products';
+  private baseUrl = environment.luv2shopApiUrl + '/products';
 
-  private categoryUrl = environment.lu2shopApiUrl + '/product-category';
+  private categoryUrl = environment.luv2shopApiUrl + '/product-category';
 
   //localhost:8080/api/products?size=100' deleted from the base url // Spring Boot API and size=100 is to get all the products
   constructor(private httpClient: HttpClient) { }
